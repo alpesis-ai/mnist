@@ -1,10 +1,13 @@
+import timeit
 import numpy as np
 
 import theano
 import theano.tensor as T
 
-from dataset.data import load_data
+from datasets.data import load_data
 from models.conv import Conv
+from models.mlp import HiddenLayer
+from models.logistic_regression import LogisticRegression
 
 
 def classifier_lenet5(learning_rate=0.1,
@@ -76,7 +79,7 @@ def classifier_lenet5(learning_rate=0.1,
     # 4D output tensor is thus of shape (batch_size, nkerns[1], 4, 4)
     layer1 = Conv(rng,
                   input=layer0.output,
-                  image_shape(batch_size, nkerns[0], 12, 12),
+                  image_shape=(batch_size, nkerns[0], 12, 12),
                   filter_shape=(nkerns[1], nkerns[0], 5, 5),
                   poolsize=(2,2))
 
@@ -145,7 +148,7 @@ def classifier_lenet5(learning_rate=0.1,
 
 
     # train the model
-    print('...training')
+    print('... training')
     # early-stopping parameters
     # look as this many examples regardless
     patience = 10000
@@ -175,7 +178,7 @@ def classifier_lenet5(learning_rate=0.1,
 
             if (iter+1) % validation_frequency == 0:
                 # compute zero-one loss on validation set
-                validation_losses = [validate_model(i) for i in range(n_valid_batches)]
+                validation_losses = [valid_model(i) for i in range(n_valid_batches)]
                 this_validation_loss = np.mean(validation_losses)
                 print('epoch %i, minibatch %i/%i, validation error %f %%' %
                       (epoch,
@@ -185,7 +188,7 @@ def classifier_lenet5(learning_rate=0.1,
 
                 if this_validation_loss < best_validation_loss:
                     # improve patience if loss imporovement is good enough
-                    if this_validation_loss < best_validation_loss * imporovement_threshold:
+                    if this_validation_loss < best_validation_loss * improvement_threshold:
                         patience = max(patience, iter * patience_increase)
 
                     best_validation_loss = this_validation_loss
@@ -212,9 +215,9 @@ def classifier_lenet5(learning_rate=0.1,
            best_iter + 1,
            test_score * 100.))
 
-    print("The code for file " +
-          os.path.split(__file__)[1] +
-          " ran for %.2fm" % ((end_time - start_time) / 60.)), file=sys.stderr)
+    # print("The code for file " +
+    #      os.path.split(__file__)[1] +
+    #      " ran for %.2fm" % ((end_time - start_time) / 60.)), file=sys.stderr)
 
 
 def experiment(state, channel):
