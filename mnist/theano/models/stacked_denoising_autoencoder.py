@@ -213,7 +213,7 @@ class StackedDenoisingAutoEncoder(object):
         # compute number of minibatches for training, validation and testing
         n_valid_batches = valid_x.get_value(borrow=True).shape[0]
         n_valid_batches //= batch_size
-        n_test_batches = test_x.get_values(borrow=True).shape[0]
+        n_test_batches = test_x.get_value(borrow=True).shape[0]
         n_test_batches //= batch_size
 
         # index to a minibatch
